@@ -1,0 +1,1664 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4f3ee" />
+    <title>Overlap — Find your hour</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f4f3ee;
+        --white: #fffefa;
+        --ink: #20231f;
+        --muted: #777b73;
+        --line: #dedfd7;
+        --lime: #d7ed62;
+        --blue: #4774e8;
+        --coral: #e8795f;
+        --green: #2e8062;
+        --mono: "DM Mono", monospace;
+        --body: "DM Sans", sans-serif;
+        --display: "Manrope", sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        overscroll-behavior-x: none;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--body);
+        font-size: 14px;
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      [x-cloak] {
+        display: none !important;
+      }
+      .topbar {
+        height: 66px;
+        padding: 0 34px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 254, 250, 0.72);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: 800 17px var(--display);
+        letter-spacing: -0.5px;
+      }
+      .brand-mark {
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        background: var(--lime);
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+        line-height: 1;
+      }
+      .top-meta {
+        color: var(--muted);
+        font: 11px var(--mono);
+        letter-spacing: 0.3px;
+      }
+      main {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 34px 34px 56px;
+      }
+      .heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 28px;
+      }
+      .eyebrow {
+        color: var(--green);
+        text-transform: uppercase;
+        font: 500 10px var(--mono);
+        letter-spacing: 1.2px;
+        margin-bottom: 8px;
+      }
+      h1 {
+        font: 600 32px/1.1 var(--display);
+        letter-spacing: -1.5px;
+        margin: 0;
+      }
+      .intro {
+        color: var(--muted);
+        margin: 8px 0 0;
+        font-size: 13px;
+      }
+      .heading-note {
+        padding: 10px 13px;
+        border-left: 2px solid var(--lime);
+        color: #555950;
+        font-size: 12px;
+        line-height: 1.5;
+        max-width: 205px;
+      }
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        padding: 16px 0 17px;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .control-group {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+      }
+      .field label,
+      .field-label {
+        color: var(--muted);
+        font: 10px var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+      }
+      .field input,
+      .field select,
+      .select-wrap select {
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--white);
+        padding: 0 10px;
+        outline: none;
+      }
+      .field input:focus,
+      .field select:focus,
+      .select-wrap select:focus {
+        border-color: #839653;
+        box-shadow: 0 0 0 2px rgba(215, 237, 98, 0.3);
+      }
+      .field input[type="date"] {
+        width: 152px;
+      }
+      .field select {
+        min-width: 192px;
+      }
+      .button {
+        height: 36px;
+        border: 1px solid var(--line);
+        background: var(--white);
+        border-radius: 3px;
+        padding: 0 12px;
+        display: inline-flex;
+        gap: 7px;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        transition:
+          background 0.15s,
+          border-color 0.15s;
+      }
+      .button:hover {
+        border-color: #9da38f;
+        background: #fff;
+      }
+      .button.primary {
+        border-color: var(--ink);
+        color: var(--white);
+        background: var(--ink);
+      }
+      .button.primary:hover {
+        background: #3a4039;
+      }
+      .button .plus {
+        font-size: 17px;
+        line-height: 0;
+        font-weight: 400;
+      }
+      .add-control {
+        display: flex;
+        align-items: flex-end;
+        gap: 7px;
+      }
+      .section-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 22px 0 10px;
+      }
+      .section-label h2 {
+        margin: 0;
+        font: 700 12px var(--display);
+      }
+      .section-label span {
+        color: var(--muted);
+        font: 10px var(--mono);
+      }
+      .timeline-shell {
+        border: 1px solid var(--line);
+        background: var(--white);
+        overflow: hidden;
+      }
+      .timeline-scroll {
+        overflow: auto;
+        max-height: 520px;
+        scrollbar-color: #b7bcaa #f3f3ed;
+        scrollbar-width: thin;
+      }
+      .timeline-scroll::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+      }
+      .timeline-scroll::-webkit-scrollbar-thumb {
+        background: #bdc2b5;
+        border: 2px solid #f3f3ed;
+        border-radius: 6px;
+      }
+      .axis,
+      .zone-row {
+        display: grid;
+        grid-template-columns: 246px max-content;
+        min-width: 100%;
+      }
+      .axis {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        background: #fbfbf7;
+        border-bottom: 1px solid var(--line);
+      }
+      .axis-label {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background: #fbfbf7;
+        border-right: 1px solid var(--line);
+        padding: 12px 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--muted);
+        font: 10px var(--mono);
+      }
+      .axis-track {
+        display: flex;
+        height: 55px;
+      }
+      .axis-day {
+        position: absolute;
+        top: 5px;
+        font: 10px var(--mono);
+        color: #72786a;
+        white-space: nowrap;
+      }
+      .tick {
+        position: relative;
+        flex: 0 0 48px;
+        height: 55px;
+        border-left: 1px solid #ebece5;
+        padding-top: 25px;
+        padding-left: 5px;
+        color: #555b52;
+        font: 10px var(--mono);
+      }
+      .tick.major {
+        border-left-color: #d3d6cc;
+      }
+      .tick .day-start {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        z-index: 2;
+        color: #383d35;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .zone-row {
+        min-height: 86px;
+        border-bottom: 1px solid #e8e9e2;
+        transition: background 0.18s;
+      }
+      .zone-row:last-child {
+        border-bottom: 0;
+      }
+      .zone-row.prominent {
+        background: #fbfbf6;
+      }
+      .zone-label {
+        position: sticky;
+        left: 0;
+        z-index: 2;
+        background: var(--white);
+        border-right: 1px solid var(--line);
+        padding: 12px 13px;
+        display: grid;
+        grid-template-columns: 9px 1fr auto;
+        align-items: start;
+        gap: 9px;
+        transition: background 0.18s;
+      }
+      .prominent .zone-label {
+        background: #fbfbf6;
+      }
+      .zone-swatch {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-top: 4px;
+      }
+      .zone-name {
+        font: 700 12px var(--display);
+        border: 0;
+        background: none;
+        padding: 0;
+        text-align: left;
+      }
+      .zone-name:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .zone-city {
+        color: var(--muted);
+        font-size: 10px;
+        margin-top: 3px;
+      }
+      .zone-local {
+        font: 10px var(--mono);
+        margin-top: 9px;
+        color: #565c52;
+      }
+      .hours-toggle {
+        border: 0;
+        background: none;
+        padding: 5px 0 0;
+        color: #536d37;
+        font: 10px var(--mono);
+      }
+      .hours-toggle:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .zone-settings {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px 8px;
+        margin-top: 9px;
+      }
+      .zone-settings label {
+        display: grid;
+        gap: 3px;
+        color: var(--muted);
+        font: 9px var(--mono);
+      }
+      .zone-settings input {
+        min-width: 0;
+        width: 100%;
+        height: 27px;
+        padding: 2px 5px;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+        background: var(--white);
+        font: 10px var(--mono);
+      }
+      .zone-settings input:focus {
+        outline: 1px solid #839653;
+      }
+      .timeline-nav {
+        display: flex;
+        gap: 5px;
+      }
+      .timeline-nav .button {
+        width: 34px;
+        padding: 0;
+        font-size: 15px;
+      }
+      .zone-tools {
+        display: grid;
+        justify-items: end;
+        gap: 8px;
+      }
+      .color-input {
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: none;
+        cursor: pointer;
+      }
+      .color-input::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+      .color-input::-webkit-color-swatch {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 50%;
+      }
+      .remove-button {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #96998f;
+        font-size: 15px;
+        line-height: 1;
+      }
+      .remove-button:hover {
+        color: #b44736;
+      }
+      .zone-track {
+        display: flex;
+        position: relative;
+        height: 86px;
+        background-image: repeating-linear-gradient(
+          to right,
+          transparent 0,
+          transparent 47px,
+          #ecece7 47px,
+          #ecece7 48px
+        );
+      }
+      .hour-cell {
+        flex: 0 0 48px;
+        height: 100%;
+        position: relative;
+        border-left: 1px solid transparent;
+      }
+      .hour-cell.major {
+        border-left-color: rgba(107, 114, 101, 0.15);
+      }
+      .hour-cell.preferred::before,
+      .hour-cell.flexible::before {
+        content: "";
+        position: absolute;
+        left: 1px;
+        right: 0;
+        top: 19px;
+        bottom: 18px;
+      }
+      .hour-cell.preferred::before {
+        background: var(--zone-color);
+        opacity: 0.8;
+      }
+      .hour-cell.flexible::before {
+        background: var(--zone-color);
+        opacity: 0.25;
+      }
+      .hour-cell.preferred.start::before,
+      .hour-cell.flexible.start::before {
+        border-radius: 3px 0 0 3px;
+      }
+      .hour-cell.preferred.end::before,
+      .hour-cell.flexible.end::before {
+        border-radius: 0 3px 3px 0;
+      }
+      .hour-cell.preferred.start.end::before,
+      .hour-cell.flexible.start.end::before {
+        border-radius: 3px;
+      }
+      .hour-cell.now-line::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        border-left: 1px solid var(--coral);
+        z-index: 1;
+      }
+      .cell-time {
+        position: absolute;
+        top: 51px;
+        left: 4px;
+        white-space: nowrap;
+        color: #565b52;
+        font: 9px var(--mono);
+      }
+      .cell-time-offset {
+        color: #95988e;
+      }
+      .zone-row.prominent .zone-track {
+        height: 100px;
+      }
+      .zone-row.prominent {
+        min-height: 100px;
+      }
+      .zone-row.prominent .hour-cell.preferred::before,
+      .zone-row.prominent .hour-cell.flexible::before {
+        top: 25px;
+        bottom: 25px;
+      }
+      .zone-row.prominent .cell-time {
+        top: 60px;
+      }
+      .legend {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        padding: 11px 14px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend-swatch {
+        width: 12px;
+        height: 8px;
+        background: var(--blue);
+        border-radius: 2px;
+      }
+      .legend-swatch.flex {
+        opacity: 0.28;
+      }
+      .legend-line {
+        height: 11px;
+        border-left: 1px solid var(--coral);
+      }
+      .drag-note {
+        margin-left: auto;
+        font: 10px var(--mono);
+      }
+      .results {
+        margin-top: 29px;
+        display: grid;
+        grid-template-columns: minmax(200px, 0.7fr) 2fr;
+        gap: 26px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+      .results-intro h2 {
+        margin: 0 0 6px;
+        font: 700 15px var(--display);
+      }
+      .results-intro p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+      .result-list {
+        display: grid;
+        gap: 8px;
+      }
+      .result {
+        display: grid;
+        grid-template-columns: 30px 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border-bottom: 1px solid var(--line);
+        padding: 4px 0 10px;
+      }
+      .result:last-child {
+        border-bottom: 0;
+      }
+      .result-rank {
+        width: 27px;
+        height: 27px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: var(--lime);
+        font: 11px var(--mono);
+      }
+      .result-time {
+        font: 600 13px var(--display);
+      }
+      .result-meta {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 3px;
+      }
+      .result-badge {
+        border: 1px solid #dfe4c3;
+        border-radius: 2px;
+        background: #f8fae9;
+        padding: 5px 7px;
+        font: 10px var(--mono);
+        white-space: nowrap;
+      }
+      .moment-panel {
+        margin-top: 24px;
+        padding: 18px 0 0;
+        border-top: 1px solid var(--line);
+        background: transparent;
+        color: var(--ink);
+        overscroll-behavior-x: contain;
+      }
+      .moment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+      }
+      .moment-header .eyebrow {
+        color: var(--green);
+      }
+      .moment-header h2 {
+        margin: 0;
+        font: 700 18px var(--display);
+      }
+      .moment-readout {
+        text-align: right;
+        font: 500 12px var(--mono);
+        color: var(--ink);
+      }
+      .moment-controls {
+        display: grid;
+        grid-template-columns: 36px 1fr 36px;
+        align-items: center;
+        gap: 12px;
+        margin: 16px 0 4px;
+      }
+      .moment-step {
+        width: 36px;
+        height: 34px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: var(--white);
+        color: var(--ink);
+        font-size: 19px;
+      }
+      .moment-step:hover {
+        border-color: #9da38f;
+        background: #fff;
+      }
+      .moment-slider {
+        width: 100%;
+        accent-color: var(--green);
+        cursor: ew-resize;
+      }
+      .moment-bounds {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 48px;
+        color: var(--muted);
+        font: 10px var(--mono);
+      }
+      .moment-list {
+        display: grid;
+        gap: 5px;
+        max-height: 430px;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        margin-top: 17px;
+        padding-right: 4px;
+        scrollbar-color: #b7bcaa transparent;
+        scrollbar-width: thin;
+      }
+      .moment-location {
+        --moment-fg: #fff;
+        min-height: 66px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-left: 5px solid var(--zone-color);
+        border-radius: 5px;
+        color: var(--moment-fg);
+      }
+      .moment-location.moment-night {
+        background: #202958;
+      }
+      .moment-location.moment-morning {
+        --moment-fg: #24220f;
+        background: #f4d94c;
+      }
+      .moment-location.moment-day {
+        --moment-fg: #182833;
+        background: #9edcf0;
+      }
+      .moment-location.moment-evening {
+        background: #41488d;
+      }
+      .moment-city-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .moment-zone-swatch {
+        width: 9px;
+        height: 9px;
+        flex: 0 0 9px;
+        border: 1px solid rgba(0, 0, 0, 0.18);
+        border-radius: 50%;
+        background: var(--zone-color);
+      }
+      .moment-city {
+        font: 700 15px var(--display);
+      }
+      .moment-zone-id {
+        margin: 4px 0 0 17px;
+        color: currentColor;
+        opacity: 0.7;
+        font: 10px var(--mono);
+      }
+      .moment-time-block {
+        text-align: right;
+      }
+      .moment-time {
+        font: 700 25px/1 var(--display);
+        font-variant-numeric: tabular-nums;
+      }
+      .moment-date {
+        margin-top: 5px;
+        font: 600 9px var(--body);
+        text-transform: uppercase;
+      }
+      .empty-state {
+        color: var(--muted);
+        font-size: 12px;
+        padding: 8px 0;
+      }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--ink);
+        color: white;
+        border-radius: 3px;
+        padding: 10px 14px;
+        font-size: 12px;
+        z-index: 10;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.16);
+      }
+      .dragging {
+        opacity: 0.45;
+      }
+      .drop-target {
+        box-shadow: inset 0 2px var(--blue);
+      }
+      @media (max-width: 720px) {
+        .topbar {
+          padding: 0 18px;
+        }
+        main {
+          padding: 25px 16px 40px;
+        }
+        .heading {
+          align-items: flex-start;
+        }
+        h1 {
+          font-size: 27px;
+        }
+        .heading-note {
+          display: none;
+        }
+        .controls {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+        .control-group {
+          width: 100%;
+        }
+        .add-control {
+          width: 100%;
+        }
+        .add-control .field {
+          flex: 1;
+        }
+        .add-control .field select {
+          min-width: 0;
+          width: 100%;
+        }
+        .axis,
+        .zone-row {
+          grid-template-columns: 210px max-content;
+        }
+        .axis-label {
+          padding-left: 10px;
+        }
+        .zone-label {
+          padding-left: 10px;
+        }
+        .results {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        .moment-panel {
+          padding: 18px 0 0;
+        }
+        .moment-location {
+          padding: 9px 10px;
+        }
+        .moment-time {
+          font-size: 22px;
+        }
+        .moment-city {
+          font-size: 13px;
+        }
+        .moment-zone-id {
+          max-width: 190px;
+          overflow-wrap: anywhere;
+        }
+        .moment-bounds {
+          padding: 0 44px;
+        }
+        .top-meta {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">↗</span> overlap
+      </div>
+      <div class="top-meta">A LITTLE MORE IN SYNC</div>
+    </header>
+    <main x-data="overlapApp()" x-init="init()" x-cloak>
+      <div class="heading">
+        <div>
+          <div class="eyebrow">A shared sense of time</div>
+          <h1>Find your hour.</h1>
+          <p class="intro">
+            See the day from every side. Make room for everyone.
+          </p>
+        </div>
+        <div class="heading-note">
+          The clearest overlap is usually the kindest meeting.
+        </div>
+      </div>
+
+      <section class="controls" aria-label="Meeting planner controls">
+        <div class="control-group">
+          <div class="field">
+            <label for="meeting-date">Date</label>
+            <input
+              id="meeting-date"
+              type="date"
+              x-model="selectedDate"
+              @change="refresh()"
+            />
+          </div>
+          <div class="field">
+            <label for="reference-zone">Day begins in</label>
+            <select
+              id="reference-zone"
+              x-model="referenceZone"
+              @change="refresh()"
+            >
+              <template x-for="zone in zones" :key="'ref-' + zone.id"
+                ><option
+                  :value="zone.id"
+                  x-text="zone.city + ' · ' + zone.id"
+                ></option
+              ></template>
+            </select>
+          </div>
+          <button class="button" @click="goToday()" aria-label="Go to today">
+            Today
+          </button>
+        </div>
+        <div class="add-control">
+          <div class="field">
+            <label for="add-zone">Add a timezone</label>
+            <select id="add-zone" x-model="newZoneId">
+              <option value="">Choose a city...</option>
+              <template x-for="zone in availableZones" :key="zone.id"
+                ><option
+                  :value="zone.id"
+                  x-text="zone.city + ' · ' + zone.id"
+                ></option
+              ></template>
+            </select>
+          </div>
+          <button class="button primary" @click="addZone()">
+            <span class="plus" aria-hidden="true">+</span> Add zone
+          </button>
+        </div>
+      </section>
+
+      <div class="section-label">
+        <h2>Local hours</h2>
+        <div class="timeline-nav">
+          <button
+            class="button"
+            @click="scrollTime(-1)"
+            aria-label="Scroll earlier"
+            title="Scroll earlier"
+          >
+            ‹
+          </button>
+          <button
+            class="button"
+            @click="scrollTime(1)"
+            aria-label="Scroll later"
+            title="Scroll later"
+          >
+            ›
+          </button>
+          <span
+            style="align-self: center; margin-left: 7px"
+            x-text="zones.length + (zones.length === 1 ? ' CITY' : ' CITIES')"
+          ></span>
+        </div>
+      </div>
+      <section
+        class="timeline-shell"
+        aria-label="Timezone availability timeline"
+      >
+        <div
+          class="timeline-scroll"
+          x-ref="timeline"
+          @scroll.passive="onScroll()"
+        >
+          <div class="axis">
+            <div class="axis-label">
+              <span>YOUR PEOPLE</span
+              ><span
+                x-text="referenceZone.split('/').pop().replaceAll('_', ' ')"
+              ></span>
+            </div>
+            <div class="axis-track">
+              <template x-for="(tick, index) in ticks" :key="tick.epoch">
+                <div
+                  class="tick"
+                  :class="{major: tick.major}"
+                  :style="{width: cellWidth + 'px', flexBasis: cellWidth + 'px'}"
+                >
+                  <span
+                    class="day-start"
+                    x-show="tick.dayLabel"
+                    x-text="tick.dayLabel"
+                  ></span>
+                  <span x-show="tick.major" x-text="tick.label"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <template x-for="(zone, zoneIndex) in zones" :key="zone.id">
+            <div
+              class="zone-row"
+              :class="{'prominent': focusedZone === zone.id, 'dragging': draggedIndex === zoneIndex, 'drop-target': dropIndex === zoneIndex}"
+              draggable="true"
+              @dragstart="dragStart($event, zoneIndex)"
+              @dragover.prevent="dragOver($event, zoneIndex)"
+              @drop.prevent="dropZone(zoneIndex)"
+              @dragend="dragEnd()"
+            >
+              <div class="zone-label">
+                <span
+                  class="zone-swatch"
+                  :style="{background: zone.color}"
+                ></span>
+                <div>
+                  <button
+                    class="zone-name"
+                    @click="focusZone(zone.id)"
+                    :aria-pressed="focusedZone === zone.id"
+                    x-text="zone.city"
+                  ></button>
+                  <div class="zone-city" x-text="zone.id"></div>
+                  <div class="zone-local" x-text="localNow(zone.id)"></div>
+                  <button
+                    class="hours-toggle"
+                    @click.stop="zone.editing = !zone.editing"
+                    x-text="zone.editing ? 'Done' : 'Edit hours'"
+                    :aria-expanded="!!zone.editing"
+                  ></button>
+                  <div
+                    class="zone-settings"
+                    x-show="zone.editing"
+                    x-transition.opacity
+                  >
+                    <label
+                      >From
+                      <input
+                        type="time"
+                        :value="timeValue(zone.start)"
+                        @change="setAvailability(zone, 'start', $event.target.value)"
+                    /></label>
+                    <label
+                      >Until
+                      <input
+                        type="time"
+                        :value="timeValue(zone.end)"
+                        @change="setAvailability(zone, 'end', $event.target.value)"
+                    /></label>
+                    <label
+                      >Flex before
+                      <input
+                        type="number"
+                        min="0"
+                        max="180"
+                        step="15"
+                        x-model.number="zone.before"
+                        @input="refreshResults()"
+                        :aria-label="'Flexibility before for ' + zone.city"
+                    /></label>
+                    <label
+                      >Flex after
+                      <input
+                        type="number"
+                        min="0"
+                        max="180"
+                        step="15"
+                        x-model.number="zone.after"
+                        @input="refreshResults()"
+                        :aria-label="'Flexibility after for ' + zone.city"
+                    /></label>
+                  </div>
+                </div>
+                <div class="zone-tools">
+                  <input
+                    class="color-input"
+                    type="color"
+                    x-model="zone.color"
+                    @input="refreshResults()"
+                    :aria-label="'Choose color for ' + zone.city"
+                    :title="'Choose color for ' + zone.city"
+                  />
+                  <button
+                    class="remove-button"
+                    @click="removeZone(zoneIndex)"
+                    :aria-label="'Remove ' + zone.city"
+                    title="Remove timezone"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
+              <div class="zone-track">
+                <template x-for="(tick, index) in ticks" :key="tick.epoch">
+                  <div
+                    class="hour-cell"
+                    :class="cellClass(zone, tick, index)"
+                    :style="{'--zone-color': zone.color, width: cellWidth + 'px', flexBasis: cellWidth + 'px'}"
+                  >
+                    <span
+                      class="cell-time"
+                      x-show="tick.major && showLocalLabels(index)"
+                      x-text="localLabel(zone.id, tick.epoch)"
+                    ></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+        <div class="legend">
+          <span class="legend-item"
+            ><span class="legend-swatch"></span>Preferred hours</span
+          >
+          <span class="legend-item"
+            ><span class="legend-swatch flex"></span>Flex time</span
+          >
+          <span class="legend-item"><span class="legend-line"></span>Now</span>
+          <span class="drag-note">DRAG TO REORDER</span>
+        </div>
+      </section>
+
+      <section
+        class="moment-panel"
+        aria-label="Local time at a selected moment"
+        @wheel="onMomentWheel($event)"
+      >
+        <div class="moment-header">
+          <div>
+            <div class="eyebrow">One instant, many clocks</div>
+            <h2>Time across places</h2>
+          </div>
+          <div class="moment-readout" x-text="momentHeading()"></div>
+        </div>
+        <div class="moment-controls">
+          <button
+            class="moment-step"
+            @click="nudgeMoment(-1)"
+            aria-label="Earlier by 15 minutes"
+            title="Earlier by 15 minutes"
+          >
+            −
+          </button>
+          <input
+            class="moment-slider"
+            type="range"
+            min="0"
+            :max="momentMax - momentStart"
+            step="900000"
+            :value="selectedMoment - momentStart"
+            @input="setMoment($event.target.value)"
+            aria-label="Select a moment during the selected day"
+          />
+          <button
+            class="moment-step"
+            @click="nudgeMoment(1)"
+            aria-label="Later by 15 minutes"
+            title="Later by 15 minutes"
+          >
+            +
+          </button>
+        </div>
+        <div class="moment-bounds">
+          <span x-text="clockAt(momentStart, referenceZone)"></span>
+          <span x-text="clockAt(momentMax, referenceZone)"></span>
+        </div>
+        <div class="moment-list" role="list">
+          <template x-for="zone in zones" :key="'moment-' + zone.id">
+            <article
+              class="moment-location"
+              :class="skyClass(zone.id)"
+              :style="{'--zone-color': zone.color}"
+              role="listitem"
+            >
+              <div>
+                <div class="moment-city-line">
+                  <span class="moment-zone-swatch" aria-hidden="true"></span>
+                  <span class="moment-city" x-text="zone.city"></span>
+                </div>
+                <div
+                  class="moment-zone-id"
+                  x-text="zone.id + ' · ' + utcOffsetLabel(zone.id, selectedMoment)"
+                ></div>
+              </div>
+              <div class="moment-time-block">
+                <div
+                  class="moment-time"
+                  x-text="clockAt(selectedMoment, zone.id)"
+                ></div>
+                <div
+                  class="moment-date"
+                  x-text="dateAt(selectedMoment, zone.id)"
+                ></div>
+              </div>
+            </article>
+          </template>
+        </div>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <div class="results-intro">
+          <div class="eyebrow">A good time for everyone</div>
+          <h2>Meeting windows</h2>
+          <p>
+            Ranked by preferred-hour overlap, then by how much flexibility they
+            need.
+          </p>
+        </div>
+        <div class="result-list">
+          <template x-for="(result, index) in suggestions" :key="result.start">
+            <div class="result">
+              <div
+                class="result-rank"
+                x-text="String(index + 1).padStart(2, '0')"
+              ></div>
+              <div>
+                <div
+                  class="result-time"
+                  x-text="formatRange(result.start, result.end, referenceZone)"
+                ></div>
+                <div
+                  class="result-meta"
+                  x-text="resultLocalSummary(result.start)"
+                ></div>
+              </div>
+              <div
+                class="result-badge"
+                x-text="result.coreCount + '/' + zones.length + ' preferred'"
+              ></div>
+            </div>
+          </template>
+          <div class="empty-state" x-show="suggestions.length === 0">
+            No shared availability in this view. Try adding flexibility or
+            moving the date.
+          </div>
+        </div>
+      </section>
+      <div
+        class="toast"
+        x-show="toast"
+        x-transition.opacity
+        x-text="toast"
+        role="status"
+      ></div>
+    </main>
+
+    <script>
+      function overlapApp() {
+        const colors = [
+          "#4774e8",
+          "#e8795f",
+          "#3d9876",
+          "#c188d8",
+          "#d2a13f",
+          "#399da4",
+          "#d9688d",
+          "#73834c",
+        ];
+        const defaults = [
+          {
+            id: "America/Los_Angeles",
+            city: "San Francisco",
+            color: colors[0],
+            start: 9 * 60,
+            end: 17 * 60,
+            before: 60,
+            after: 60,
+          },
+          {
+            id: "Europe/London",
+            city: "London",
+            color: colors[1],
+            start: 9 * 60,
+            end: 17 * 60,
+            before: 30,
+            after: 60,
+          },
+          {
+            id: "Asia/Tokyo",
+            city: "Tokyo",
+            color: colors[2],
+            start: 9 * 60,
+            end: 17 * 60,
+            before: 60,
+            after: 30,
+          },
+        ];
+        const cityNames = {
+          "America/Los_Angeles": "San Francisco",
+          "America/Denver": "Denver",
+          "America/Chicago": "Chicago",
+          "America/New_York": "New York",
+          "America/Toronto": "Toronto",
+          "America/Vancouver": "Vancouver",
+          "America/Sao_Paulo": "São Paulo",
+          "Europe/London": "London",
+          "Europe/Paris": "Paris",
+          "Europe/Berlin": "Berlin",
+          "Europe/Athens": "Athens",
+          "Africa/Cairo": "Cairo",
+          "Africa/Johannesburg": "Johannesburg",
+          "Asia/Dubai": "Dubai",
+          "Asia/Kolkata": "Mumbai",
+          "Asia/Singapore": "Singapore",
+          "Asia/Shanghai": "Shanghai",
+          "Asia/Tokyo": "Tokyo",
+          "Asia/Seoul": "Seoul",
+          "Australia/Perth": "Perth",
+          "Australia/Sydney": "Sydney",
+          "Pacific/Auckland": "Auckland",
+        };
+        const supportedZones =
+          typeof Intl.supportedValuesOf === "function"
+            ? Intl.supportedValuesOf("timeZone")
+            : Object.keys(cityNames);
+        const fmtCache = new Map();
+        const formatter = (zone) => {
+          if (!fmtCache.has(zone))
+            fmtCache.set(
+              zone,
+              new Intl.DateTimeFormat("en-GB", {
+                timeZone: zone,
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                hourCycle: "h23",
+              }),
+            );
+          return fmtCache.get(zone);
+        };
+        const partsAt = (epoch, zone) => {
+          const parts = Object.fromEntries(
+            formatter(zone)
+              .formatToParts(new Date(epoch))
+              .map((part) => [part.type, part.value]),
+          );
+          return {
+            year: +parts.year,
+            month: +parts.month,
+            day: +parts.day,
+            hour: +parts.hour,
+            minute: +parts.minute,
+          };
+        };
+        const dateKey = (parts) =>
+          `${parts.year}-${String(parts.month).padStart(2, "0")}-${String(parts.day).padStart(2, "0")}`;
+        const dateInput = (date) =>
+          `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        const nextDateInput = (date) => {
+          const [year, month, day] = date.split("-").map(Number);
+          const next = new Date(Date.UTC(year, month - 1, day + 1));
+          return `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`;
+        };
+        const localDateStart = (date, zone) => {
+          const [year, month, day] = date.split("-").map(Number);
+          const target = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+          let low = Date.UTC(year, month - 1, day) - 48 * 3600000;
+          let high = Date.UTC(year, month - 1, day) + 48 * 3600000;
+          while (high - low > 60000) {
+            const mid = Math.floor((low + high) / 120000) * 60000;
+            if (dateKey(partsAt(mid, zone)) < target) low = mid;
+            else high = mid;
+          }
+          return high;
+        };
+        const pad = (value) => String(value).padStart(2, "0");
+        const clock = (epoch, zone) => {
+          const parts = partsAt(epoch, zone);
+          return `${pad(parts.hour)}:${pad(parts.minute)}`;
+        };
+        const dateLabel = (epoch, zone) => {
+          const parts = partsAt(epoch, zone);
+          return new Intl.DateTimeFormat("en", {
+            timeZone: zone,
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          }).format(new Date(epoch));
+        };
+        const minuteOfDay = (epoch, zone) => {
+          const parts = partsAt(epoch, zone);
+          return parts.hour * 60 + parts.minute;
+        };
+        const inRange = (minute, start, end) => {
+          const duration = (end - start + 1440) % 1440 || 1440;
+          return (minute - start + 1440) % 1440 < duration;
+        };
+
+        return {
+          zones: defaults.map((zone) => ({ ...zone })),
+          selectedDate: dateInput(new Date()),
+          referenceZone:
+            Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
+          newZoneId: "",
+          focusedZone: null,
+          ticks: [],
+          suggestions: [],
+          momentStart: 0,
+          momentMax: 0,
+          selectedMoment: 0,
+          momentWheelRemainder: 0,
+          cellWidth: 48,
+          draggedIndex: null,
+          dropIndex: null,
+          toast: "",
+          toastTimer: null,
+          get availableZones() {
+            const current = new Set(this.zones.map((zone) => zone.id));
+            return supportedZones
+              .filter((id) => !current.has(id))
+              .map((id) => ({
+                id,
+                city: cityNames[id] || id.split("/").pop().replaceAll("_", " "),
+              }));
+          },
+          init() {
+            if (!this.zones.some((zone) => zone.id === this.referenceZone))
+              this.zones.unshift({
+                id: this.referenceZone,
+                city:
+                  cityNames[this.referenceZone] ||
+                  this.referenceZone.split("/").pop().replaceAll("_", " "),
+                color: colors[3],
+                start: 540,
+                end: 1020,
+                before: 30,
+                after: 30,
+              });
+            this.refresh();
+          },
+          refresh() {
+            if (!this.selectedDate) return;
+            const start = localDateStart(this.selectedDate, this.referenceZone);
+            const end = localDateStart(
+              nextDateInput(this.selectedDate),
+              this.referenceZone,
+            );
+            this.momentStart = start;
+            this.momentMax = end - 15 * 60000;
+            const now = Date.now();
+            let moment = start + 12 * 60 * 60000;
+            if (
+              this.selectedDate === dateInput(new Date()) &&
+              now >= start &&
+              now < end
+            )
+              moment =
+                start + Math.round((now - start) / (15 * 60000)) * 15 * 60000;
+            this.selectedMoment = Math.max(
+              start,
+              Math.min(this.momentMax, moment),
+            );
+            this.ticks = Array.from({ length: 144 }, (_, index) => {
+              const epoch = start + index * 30 * 60000;
+              const ref = partsAt(epoch, this.referenceZone);
+              const previous = index
+                ? partsAt(epoch - 30 * 60000, this.referenceZone)
+                : null;
+              const major = ref.minute === 0;
+              const newDay = !previous || dateKey(ref) !== dateKey(previous);
+              return {
+                epoch,
+                major,
+                label: major ? clock(epoch, this.referenceZone) : "",
+                dayLabel: newDay ? dateLabel(epoch, this.referenceZone) : "",
+              };
+            });
+            this.refreshResults();
+          },
+          refreshResults() {
+            if (!this.zones.length) {
+              this.suggestions = [];
+              return;
+            }
+            const candidates = [];
+            let active = null;
+            for (let index = 0; index < this.ticks.length; index++) {
+              const epoch = this.ticks[index].epoch + 15 * 60000;
+              const inFlex = this.zones.every((zone) =>
+                inRange(
+                  minuteOfDay(epoch, zone.id),
+                  zone.start - zone.before,
+                  zone.end + zone.after,
+                ),
+              );
+              if (inFlex && !active) active = { from: index, core: [] };
+              if (inFlex && active)
+                active.core.push(
+                  this.zones.filter((zone) =>
+                    inRange(minuteOfDay(epoch, zone.id), zone.start, zone.end),
+                  ).length,
+                );
+              if ((!inFlex || index === this.ticks.length - 1) && active) {
+                const to =
+                  inFlex && index === this.ticks.length - 1 ? index + 1 : index;
+                if (to - active.from >= 2) {
+                  const center = Math.floor((active.from + to - 1) / 2);
+                  candidates.push({
+                    start: this.ticks[active.from].epoch,
+                    end: this.ticks[to - 1].epoch + 30 * 60000,
+                    coreCount: Math.max(...active.core),
+                    coreAverage:
+                      active.core.reduce((sum, count) => sum + count, 0) /
+                      active.core.length,
+                    center: this.ticks[center].epoch,
+                  });
+                }
+                active = null;
+              }
+            }
+            candidates.sort(
+              (a, b) =>
+                b.coreAverage - a.coreAverage ||
+                b.coreCount - a.coreCount ||
+                b.end - b.start - (a.end - a.start),
+            );
+            this.suggestions = candidates.slice(0, 3);
+          },
+          addZone() {
+            if (!this.newZoneId) return;
+            const id = this.newZoneId;
+            const city =
+              cityNames[id] || id.split("/").pop().replaceAll("_", " ");
+            this.zones.push({
+              id,
+              city,
+              color: colors[this.zones.length % colors.length],
+              start: 540,
+              end: 1020,
+              before: 30,
+              after: 30,
+            });
+            this.newZoneId = "";
+            this.refreshResults();
+          },
+          removeZone(index) {
+            this.zones.splice(index, 1);
+            if (
+              this.focusedZone &&
+              !this.zones.some((zone) => zone.id === this.focusedZone)
+            )
+              this.focusedZone = null;
+            this.refreshResults();
+          },
+          focusZone(id) {
+            this.focusedZone = this.focusedZone === id ? null : id;
+          },
+          localNow(zone) {
+            return `NOW  ${clock(Date.now(), zone)}`;
+          },
+          momentHeading() {
+            return `${dateLabel(this.selectedMoment, this.referenceZone)} · ${clock(this.selectedMoment, this.referenceZone)} ${this.utcOffsetLabel(this.referenceZone, this.selectedMoment)}`;
+          },
+          clockAt(epoch, zone) {
+            return clock(epoch, zone);
+          },
+          dateAt(epoch, zone) {
+            return dateLabel(epoch, zone);
+          },
+          utcOffsetLabel(zone, epoch) {
+            const parts = new Intl.DateTimeFormat("en", {
+              timeZone: zone,
+              timeZoneName: "shortOffset",
+            }).formatToParts(new Date(epoch));
+            return parts
+              .find((part) => part.type === "timeZoneName")
+              .value.replace("GMT", "UTC");
+          },
+          skyClass(zone) {
+            const hour = partsAt(this.selectedMoment, zone).hour;
+            if (hour < 5 || hour >= 20) return "moment-night";
+            if (hour < 11) return "moment-morning";
+            if (hour < 17) return "moment-day";
+            return "moment-evening";
+          },
+          setMoment(offset) {
+            const step = 15 * 60000;
+            this.selectedMoment =
+              this.momentStart + Math.round(Number(offset) / step) * step;
+          },
+          nudgeMoment(direction) {
+            this.setMoment(
+              this.selectedMoment - this.momentStart + direction * 15 * 60000,
+            );
+          },
+          onMomentWheel(event) {
+            if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
+            event.preventDefault();
+            this.momentWheelRemainder += event.deltaX;
+            const steps = Math.trunc(this.momentWheelRemainder / 40);
+            if (!steps) return;
+            this.momentWheelRemainder -= steps * 40;
+            this.nudgeMoment(steps);
+          },
+          timeValue(minute) {
+            return `${pad(Math.floor(minute / 60) % 24)}:${pad(minute % 60)}`;
+          },
+          setAvailability(zone, key, value) {
+            const [hour, minute] = value.split(":").map(Number);
+            zone[key] = hour * 60 + minute;
+            this.refreshResults();
+          },
+          localLabel(zone, epoch) {
+            return clock(epoch, zone);
+          },
+          showLocalLabels(index) {
+            return index === 0 || index % 4 === 0;
+          },
+          cellClass(zone, tick, index) {
+            const minute = minuteOfDay(tick.epoch + 15 * 60000, zone.id);
+            const core = inRange(minute, zone.start, zone.end);
+            const flex =
+              !core &&
+              inRange(minute, zone.start - zone.before, zone.end + zone.after);
+            const previous = index
+              ? minuteOfDay(this.ticks[index - 1].epoch + 15 * 60000, zone.id)
+              : null;
+            const next =
+              index < this.ticks.length - 1
+                ? minuteOfDay(this.ticks[index + 1].epoch + 15 * 60000, zone.id)
+                : null;
+            const beforeStart =
+              previous === null ||
+              (!inRange(previous, zone.start, zone.end) &&
+                !inRange(
+                  previous,
+                  zone.start - zone.before,
+                  zone.end + zone.after,
+                ));
+            const afterEnd =
+              next === null ||
+              (!inRange(next, zone.start, zone.end) &&
+                !inRange(
+                  next,
+                  zone.start - zone.before,
+                  zone.end + zone.after,
+                ));
+            const now =
+              Date.now() >= tick.epoch && Date.now() < tick.epoch + 30 * 60000;
+            return {
+              major: tick.major,
+              preferred: core,
+              flexible: flex,
+              start: (core || flex) && beforeStart,
+              end: (core || flex) && afterEnd,
+              "now-line": now,
+            };
+          },
+          formatRange(start, end, zone) {
+            return `${dateLabel(start, zone)} · ${clock(start, zone)}–${clock(end, zone)}`;
+          },
+          resultLocalSummary(start) {
+            return this.zones
+              .map((zone) => `${zone.city} ${clock(start, zone)}`)
+              .join("  ·  ");
+          },
+          goToday() {
+            this.selectedDate = dateInput(new Date());
+            this.refresh();
+          },
+          scrollTime(direction) {
+            this.$refs.timeline.scrollBy({
+              left: direction * 480,
+              behavior: "smooth",
+            });
+          },
+          onScroll() {},
+          dragStart(event, index) {
+            this.draggedIndex = index;
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", String(index));
+          },
+          dragOver(event, index) {
+            this.dropIndex = index;
+            event.dataTransfer.dropEffect = "move";
+          },
+          dropZone(index) {
+            if (this.draggedIndex === null || this.draggedIndex === index)
+              return;
+            const [zone] = this.zones.splice(this.draggedIndex, 1);
+            this.zones.splice(index, 0, zone);
+            this.dragEnd();
+            this.refreshResults();
+          },
+          dragEnd() {
+            this.draggedIndex = null;
+            this.dropIndex = null;
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

@@ -82,17 +82,12 @@
         font-size: 15px;
         line-height: 1;
       }
-      .top-meta {
-        color: var(--muted);
-        font: 11px var(--mono);
-        letter-spacing: 0.3px;
-      }
       .top-actions {
         display: flex;
         align-items: center;
         gap: 18px;
       }
-      .theme-toggle {
+      .header-toggle {
         height: 32px;
         padding: 0 9px;
         border: 1px solid var(--line);
@@ -104,10 +99,10 @@
           background 0.15s,
           border-color 0.15s;
       }
-      .theme-toggle:hover {
+      .header-toggle:hover {
         border-color: #9da38f;
       }
-      .theme-toggle:focus-visible {
+      .header-toggle:focus-visible {
         outline: 2px solid var(--green);
         outline-offset: 2px;
       }
@@ -936,11 +931,8 @@
         .moment-bounds {
           padding: 0 44px;
         }
-        .top-meta {
-          display: none;
-        }
         .top-actions {
-          gap: 0;
+          gap: 6px;
         }
       }
       @media (prefers-reduced-motion: reduce) {
@@ -964,9 +956,16 @@
         <span class="brand-mark" aria-hidden="true">↗</span> overlap
       </div>
       <div class="top-actions">
-        <div class="top-meta">A LITTLE MORE IN SYNC</div>
         <button
-          class="theme-toggle"
+          class="header-toggle"
+          type="button"
+          @click="toggleTimeFormat()"
+          :aria-pressed="timeFormat === '12'"
+          :aria-label="timeFormat === '24' ? 'Switch to AM/PM time' : 'Switch to 24-hour time'"
+          x-text="timeFormat === '24' ? '24-hour' : 'AM/PM'"
+        ></button>
+        <button
+          class="header-toggle"
           type="button"
           @click="darkMode = !darkMode"
           :aria-pressed="darkMode"
@@ -1243,11 +1242,11 @@
             class="moment-slider"
             type="range"
             min="0"
-            :max="momentMax - momentStart"
+            :max="momentSliderDuration"
             step="900000"
-            :value="selectedMoment - momentStart"
+            :value="momentSliderValue"
             @input="setMoment($event.target.value)"
-            aria-label="Select a moment during the selected day"
+            aria-label="Select a moment within 25 hours before or after the selected time"
           />
           <button
             class="moment-step"
@@ -1259,8 +1258,10 @@
           </button>
         </div>
         <div class="moment-bounds">
-          <span x-text="clockAt(momentStart, referenceZone)"></span>
-          <span x-text="clockAt(momentMax, referenceZone)"></span>
+          <span x-text="clockAt(momentSliderStart, referenceZone)"></span>
+          <span
+            x-text="clockAt(momentSliderStart + momentSliderDuration, referenceZone)"
+          ></span>
         </div>
         <div class="moment-list" role="list">
           <template x-for="zone in zones" :key="'moment-' + zone.id">
@@ -1464,8 +1465,12 @@
           return high;
         };
         const pad = (value) => String(value).padStart(2, "0");
-        const clock = (epoch, zone) => {
+        const clock = (epoch, zone, format) => {
           const parts = partsAt(epoch, zone);
+          if (format === "12") {
+            const hour = parts.hour % 12 || 12;
+            return `${hour}:${pad(parts.minute)} ${parts.hour < 12 ? "AM" : "PM"}`;
+          }
           return `${pad(parts.hour)}:${pad(parts.minute)}`;
         };
         const dateLabel = (epoch, zone) => {
@@ -1488,6 +1493,7 @@
 
         return {
           darkMode: false,
+          timeFormat: "24",
           zones: defaults.map((zone) => ({ ...zone })),
           selectedDate: dateInput(new Date()),
           referenceZone:
@@ -1498,6 +1504,8 @@
           suggestions: [],
           momentStart: 0,
           momentMax: 0,
+          momentSliderStart: 0,
+          momentSliderDuration: 50 * 60 * 60000,
           selectedMoment: 0,
           momentWheelRemainder: 0,
           cellWidth: 48,
@@ -1551,6 +1559,8 @@
               start,
               Math.min(this.momentMax, moment),
             );
+            this.momentSliderStart =
+              this.selectedMoment - this.momentSliderDuration / 2;
             this.ticks = Array.from({ length: 144 }, (_, index) => {
               const epoch = start + index * 30 * 60000;
               const ref = partsAt(epoch, this.referenceZone);
@@ -1562,7 +1572,9 @@
               return {
                 epoch,
                 major,
-                label: major ? clock(epoch, this.referenceZone) : "",
+                label: major
+                  ? clock(epoch, this.referenceZone, this.timeFormat)
+                  : "",
                 dayLabel: newDay ? dateLabel(epoch, this.referenceZone) : "",
               };
             });
@@ -1647,13 +1659,22 @@
             this.focusedZone = this.focusedZone === id ? null : id;
           },
           localNow(zone) {
-            return `NOW  ${clock(Date.now(), zone)}`;
+            return `NOW  ${clock(Date.now(), zone, this.timeFormat)}`;
           },
           momentHeading() {
-            return `${dateLabel(this.selectedMoment, this.referenceZone)} · ${clock(this.selectedMoment, this.referenceZone)} ${this.utcOffsetLabel(this.referenceZone, this.selectedMoment)}`;
+            return `${dateLabel(this.selectedMoment, this.referenceZone)} · ${clock(this.selectedMoment, this.referenceZone, this.timeFormat)} ${this.utcOffsetLabel(this.referenceZone, this.selectedMoment)}`;
+          },
+          get momentSliderValue() {
+            return Math.max(
+              0,
+              Math.min(
+                this.momentSliderDuration,
+                this.selectedMoment - this.momentSliderStart,
+              ),
+            );
           },
           clockAt(epoch, zone) {
-            return clock(epoch, zone);
+            return clock(epoch, zone, this.timeFormat);
           },
           dateAt(epoch, zone) {
             return dateLabel(epoch, zone);
@@ -1675,14 +1696,10 @@
             return "moment-evening";
           },
           setMoment(offset) {
-            const step = 15 * 60000;
-            this.selectedMoment =
-              this.momentStart + Math.round(Number(offset) / step) * step;
+            this.selectedMoment = this.momentSliderStart + Number(offset);
           },
           nudgeMoment(direction) {
-            this.setMoment(
-              this.selectedMoment - this.momentStart + direction * 15 * 60000,
-            );
+            this.selectedMoment += direction * 15 * 60000;
           },
           onMomentWheel(event) {
             if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
@@ -1702,7 +1719,7 @@
             this.refreshResults();
           },
           localLabel(zone, epoch) {
-            return clock(epoch, zone);
+            return clock(epoch, zone, this.timeFormat);
           },
           showLocalLabels(index) {
             return index === 0 || index % 4 === 0;
@@ -1748,12 +1765,23 @@
             };
           },
           formatRange(start, end, zone) {
-            return `${dateLabel(start, zone)} · ${clock(start, zone)}–${clock(end, zone)}`;
+            return `${dateLabel(start, zone)} · ${clock(start, zone, this.timeFormat)}–${clock(end, zone, this.timeFormat)}`;
           },
           resultLocalSummary(start) {
             return this.zones
-              .map((zone) => `${zone.city} ${clock(start, zone)}`)
+              .map(
+                (zone) => `${zone.city} ${clock(start, zone, this.timeFormat)}`,
+              )
               .join("  ·  ");
+          },
+          toggleTimeFormat() {
+            this.timeFormat = this.timeFormat === "24" ? "12" : "24";
+            this.ticks = this.ticks.map((tick) => ({
+              ...tick,
+              label: tick.major
+                ? clock(tick.epoch, this.referenceZone, this.timeFormat)
+                : "",
+            }));
           },
           goToday() {
             this.selectedDate = dateInput(new Date());

@@ -962,7 +962,7 @@
                     @click="toggleTimeFormat()"
                     :aria-pressed="timeFormat === '12'"
                     :aria-label="timeFormat === '24' ? 'Switch to AM/PM time' : 'Switch to 24-hour time'"
-                    x-text="timeFormat === '24' ? '24-hour' : 'AM/PM'"
+                    x-text="timeFormat === '24' ? '24-hr' : 'AM/PM'"
                 ></button>
                 <button
                     class="header-toggle"
@@ -970,7 +970,7 @@
                     @click="darkMode = !darkMode"
                     :aria-pressed="darkMode"
                     :aria-label="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
-                    x-text="darkMode ? '☼ Light' : '◐ Dark'"
+                    x-text="darkMode ? '☼ Light' : '◐ Night'"
                 ></button>
             </div>
         </header>

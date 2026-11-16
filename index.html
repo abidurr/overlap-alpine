@@ -517,9 +517,14 @@
                 position: absolute;
                 top: 51px;
                 left: 4px;
+                padding: 0;
+                border: 0;
+                background: none;
                 white-space: nowrap;
                 color: #565b52;
                 font: 9px var(--mono);
+                text-align: left;
+                cursor: default;
             }
             .cell-time-offset {
                 color: #95988e;
@@ -1102,6 +1107,7 @@
                                     class="tick"
                                     :class="{major: tick.major}"
                                     :style="{width: cellWidth + 'px', flexBasis: cellWidth + 'px'}"
+                                    @click="selectMoment(tick.epoch)"
                                 >
                                     <span
                                         class="day-start"
@@ -1120,13 +1126,15 @@
                         <div
                             class="zone-row"
                             :class="{'prominent': focusedZone === zone.id, 'dragging': draggedIndex === zoneIndex, 'drop-target': dropIndex === zoneIndex}"
-                            draggable="true"
-                            @dragstart="dragStart($event, zoneIndex)"
                             @dragover.prevent="dragOver($event, zoneIndex)"
                             @drop.prevent="dropZone(zoneIndex)"
                             @dragend="dragEnd()"
                         >
-                            <div class="zone-label">
+                            <div
+                                class="zone-label"
+                                draggable="true"
+                                @dragstart="dragStart($event, zoneIndex)"
+                            >
                                 <span
                                     class="zone-swatch"
                                     :style="{background: zone.color}"
@@ -1223,12 +1231,16 @@
                                         class="hour-cell"
                                         :class="cellClass(zone, tick, index)"
                                         :style="{'--zone-color': zone.color, width: cellWidth + 'px', flexBasis: cellWidth + 'px'}"
+                                        @click="selectMoment(tick.epoch)"
                                     >
-                                        <span
+                                        <button
+                                            type="button"
                                             class="cell-time"
                                             x-show="tick.major && showLocalLabels(index)"
+                                            @click.stop="selectMoment(tick.epoch)"
+                                            :aria-label="'Set time to ' + localLabel(zone.id, tick.epoch) + ' in ' + zone.city"
                                             x-text="localLabel(zone.id, tick.epoch)"
-                                        ></span>
+                                        ></button>
                                     </div>
                                 </template>
                             </div>
@@ -1793,6 +1805,11 @@
                     setMoment(offset) {
                         this.selectedMoment =
                             this.momentSliderStart + Number(offset);
+                    },
+                    selectMoment(epoch) {
+                        this.selectedMoment = epoch;
+                        this.momentSliderStart =
+                            epoch - this.momentSliderDuration / 2;
                     },
                     nudgeMoment(direction) {
                         this.selectedMoment += direction * 15 * 60000;

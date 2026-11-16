@@ -90,6 +90,7 @@
             }
             .header-toggle {
                 height: 32px;
+                width: 60px;
                 padding: 0 9px;
                 border: 1px solid var(--line);
                 border-radius: 8px;
@@ -973,7 +974,7 @@
                     @click="toggleTimeFormat()"
                     :aria-pressed="timeFormat === '12'"
                     :aria-label="timeFormat === '24' ? 'Switch to AM/PM time' : 'Switch to 24-hour time'"
-                    x-text="timeFormat === '24' ? '24-hr' : 'AM/PM'"
+                    x-text="timeFormat === '24' ? 'AM/PM' : '24 hour'"
                 ></button>
                 <button
                     class="header-toggle"
@@ -981,7 +982,7 @@
                     @click="darkMode = !darkMode"
                     :aria-pressed="darkMode"
                     :aria-label="darkMode ? 'Switch to light theme' : 'Switch to dark theme'"
-                    x-text="darkMode ? '☼ Light' : '◐ Night'"
+                    x-text="darkMode ? '☼ Light' : '◐ Dark'"
                 ></button>
             </div>
         </header>

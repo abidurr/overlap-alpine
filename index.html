@@ -8,7 +8,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Fredoka&family=Inconsolata&display=swap"
             rel="stylesheet"
         />
         <script
@@ -27,9 +27,9 @@
                 --blue: #4774e8;
                 --coral: #e8795f;
                 --green: #2e8062;
-                --mono: "DM Mono", monospace;
-                --body: "DM Sans", sans-serif;
-                --display: "Manrope", sans-serif;
+                --mono: "Inconsolata", monospace;
+                --body: "Fredoka", sans-serif;
+                --display: "Fredoka", sans-serif;
             }
             * {
                 box-sizing: border-box;
@@ -43,6 +43,7 @@
                 color: var(--ink);
                 font-family: var(--body);
                 font-size: 14px;
+                letter-spacing: 0.5px;
             }
             button,
             input,
@@ -70,7 +71,7 @@
                 align-items: center;
                 gap: 10px;
                 font: 800 17px var(--display);
-                letter-spacing: -0.5px;
+                /*letter-spacing: -0.5px;*/
             }
             .brand-mark {
                 width: 25px;
@@ -127,7 +128,7 @@
             }
             h1 {
                 font: 600 32px/1.1 var(--display);
-                letter-spacing: -1.5px;
+                /*letter-spacing: -1.5px;*/
                 margin: 0;
             }
             .intro {
@@ -1047,7 +1048,7 @@
             </section>
 
             <div class="section-label">
-                <h2>Local Availability</h2>
+                <h2 style="font-size: 18px">Local Availability</h2>
                 <div class="timeline-nav">
                     <button
                         class="button"

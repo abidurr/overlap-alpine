@@ -267,6 +267,7 @@
             .zone-row {
                 display: grid;
                 grid-template-columns: 246px max-content;
+                width: max-content;
                 min-width: 100%;
             }
             .axis {
@@ -902,6 +903,10 @@
                 .axis,
                 .zone-row {
                     grid-template-columns: 210px max-content;
+                }
+                .axis-label,
+                .zone-label {
+                    position: static;
                 }
                 .axis-label {
                     padding-left: 10px;
